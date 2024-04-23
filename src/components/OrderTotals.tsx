@@ -4,13 +4,21 @@ import { OrderItem } from "../types";
 
 type OrderTotalProps = {
   order: OrderItem[];
+  tip: number;
+  placeOrder: () => void;
 };
 
-const OrderTotals = ({ order }: OrderTotalProps) => {
+const OrderTotals = ({ order, tip, placeOrder }: OrderTotalProps) => {
   const subtotalAmount = useMemo(
     () => order.reduce((total, item) => total + item.quantity * item.price, 0),
     [order]
   );
+  const tipAmount = useMemo(() => tip * subtotalAmount, [tip, subtotalAmount]);
+  const totalAmount = useMemo(
+    () => tipAmount + subtotalAmount,
+    [tipAmount, subtotalAmount]
+  );
+
   return (
     <>
       <div className="space-y-3">
@@ -20,14 +28,21 @@ const OrderTotals = ({ order }: OrderTotalProps) => {
           <span className="font-black">{formatCurrency(subtotalAmount)} </span>
         </p>
         <p>
-          Propina: <span className="font-black">{formatCurrency(0)} </span>
+          Propina:{" "}
+          <span className="font-black">{formatCurrency(tipAmount)} </span>
         </p>
         <p>
           Total a pagar:{" "}
-          <span className="font-black">{formatCurrency(0)} </span>
+          <span className="font-black">{formatCurrency(totalAmount)} </span>
         </p>
       </div>
-      <button></button>
+      <button
+        className=" w-full bg-gray-700 p-3 uppercase text-white font-bold mt-10 rounded-lg  transition-all disabled:opacity-15"
+        disabled={totalAmount === 0}
+        onClick={placeOrder}
+      >
+        Guardar Orden
+      </button>
     </>
   );
 };
